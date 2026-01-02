@@ -1,15 +1,15 @@
-# Hacker News Reader（記事を読む中心）開発計画（Nuxt 3）
+# Hacker News Reader（記事を読む中心）開発計画（Nuxt 4）
 
 ## 目的 / コンセプト
 
-- **記事を読む体験を中心**に据えた Hacker News リーダーサイトを Nuxt 3 で開発する。
+- **記事を読む体験を中心**に据えた Hacker News リーダーサイトを Nuxt 4 で開発する。
 - 主導線は「一覧 → 記事詳細 → 外部記事へ」。コメントは補助情報として扱い、**重くならない範囲で段階的に表示**する。
 
 ## 前提（技術スタック / 制約）
 
-- Nuxt 3 / Vue 3 / TypeScript
+- Nuxt 4 / Vue 3 / TypeScript
 - データソースは Hacker News Firebase API（ID一覧 → item個別取得が基本）
-- N+1 を吸収するため、**Nuxt の Server Routes（`server/api`）で集約**し、キャッシュ/並列制御/DTO整形を行う
+- N+1 を吸収するため、**Nuxt（Nitro）の Server Routes（`server/api`）で集約**し、キャッシュ/並列制御/DTO整形を行う
 
 ## MVP（最小で「読める」状態）
 
@@ -32,7 +32,7 @@
 - 一覧 item 取得の並列数制限（無制限にしない）
 - dead/deleted など「存在するが表示しづらい」ケースの扱い（一覧で除外 or 表示を弱める）
 
-## アーキテクチャ（Nuxt 3 の載せ方）
+## アーキテクチャ（Nuxt 4 の載せ方）
 
 ### Pages（UIルーティング）
 
@@ -46,6 +46,17 @@
 - `server/api/item/[id].get.ts`：詳細データ（item取得 + optional コメント取得）
 
 > API 契約は `spec/api-contract.md` を参照。
+
+### ルートルール / 生成（`routeRules`）の扱い（重要）
+
+このリポジトリは `nuxt.config.ts` に `routeRules` があり、`/` が `prerender: true` になっている。
+
+- HN は更新頻度が高いため、**一覧ページの完全プリレンダーは内容が古くなりやすい**。
+- 方針候補:
+  - **SSR + サーバ側キャッシュ**（推奨）
+  - もしくは `routeRules` を `swr` / `isr` 相当の戦略に寄せる（デプロイ環境に依存）
+
+※ MVP 段階では「SSR + `/api/*` の短期キャッシュ」を前提に設計する。
 
 ### Composables（取得の統一）
 
