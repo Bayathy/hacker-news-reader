@@ -11,14 +11,19 @@
     </div>
 
     <div class="mt-2 text-sm leading-relaxed">
+      <!-- eslint-disable vue/no-v-html -->
       <div
         v-if="node.text"
         class="prose prose-sm max-w-none"
         v-html="node.text"
       />
-      <p v-else class="text-(--ui-text-muted)">
+      <p
+        v-else
+        class="text-(--ui-text-muted)"
+      >
         （このコメントは削除されました）
       </p>
+      <!-- eslint-enable vue/no-v-html -->
     </div>
 
     <div
@@ -54,4 +59,3 @@ const levelClass = computed(() => {
   return 'pl-4 border-l border-(--ui-border-muted)'
 })
 </script>
-

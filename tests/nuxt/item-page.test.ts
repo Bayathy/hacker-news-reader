@@ -3,6 +3,7 @@ import { nextTick, ref } from 'vue'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 
 import ItemPage from '~/pages/item/[id].vue'
+import type { ItemResponse } from '~/types/api'
 
 let refreshSpy: ReturnType<typeof vi.fn> | null = null
 
@@ -33,7 +34,7 @@ mockNuxtImport('useItem', () => {
 
 mockNuxtImport('useItemComments', () => {
   return () => {
-    const data = ref(null)
+    const data = ref<ItemResponse | null>(null)
     const pending = ref(false)
     const error = ref(null)
 
