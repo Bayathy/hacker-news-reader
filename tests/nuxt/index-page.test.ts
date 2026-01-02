@@ -4,6 +4,10 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 
 import IndexPage from '~/pages/index.vue'
 
+mockNuxtImport('useRoute', () => {
+  return () => ({ query: {} })
+})
+
 mockNuxtImport('useStories', () => {
   return () => {
     return {

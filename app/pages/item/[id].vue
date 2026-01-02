@@ -1,7 +1,11 @@
 <template>
   <UContainer class="py-6">
     <div class="flex items-center justify-between gap-4">
-      <UButton color="neutral" variant="ghost" to="/">
+      <UButton
+        color="neutral"
+        variant="ghost"
+        to="/"
+      >
         ← 一覧へ
       </UButton>
 
@@ -25,13 +29,19 @@
         :description="errorMessage"
       />
 
-      <div v-else-if="pending" class="grid gap-3">
+      <div
+        v-else-if="pending"
+        class="grid gap-3"
+      >
         <USkeleton class="h-8" />
         <USkeleton class="h-5 w-3/5" />
         <USkeleton class="h-24" />
       </div>
 
-      <UCard v-else-if="data?.item" :ui="{ body: 'p-5' }">
+      <UCard
+        v-else-if="data?.item"
+        :ui="{ body: 'p-5' }"
+      >
         <h1 class="text-xl font-semibold">
           {{ data.item.title }}
         </h1>
