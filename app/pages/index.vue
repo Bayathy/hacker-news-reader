@@ -6,7 +6,7 @@
           Hacker News
         </h1>
         <p class="text-sm text-(--ui-text-muted)">
-          Top stories（30件ずつ）
+          {{ typeLabel }} stories（30件ずつ）
         </p>
       </div>
 
@@ -15,7 +15,7 @@
           color="neutral"
           variant="ghost"
           :disabled="page <= 1"
-          @click="page--"
+          @click="setPage(page - 1)"
         >
           前へ
         </UButton>
@@ -24,11 +24,24 @@
           color="neutral"
           variant="ghost"
           :disabled="!canGoNext"
-          @click="page++"
+          @click="setPage(page + 1)"
         >
           次へ
         </UButton>
       </div>
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center gap-2">
+      <UButton
+        v-for="option in typeOptions"
+        :key="option.value"
+        color="neutral"
+        :variant="type === option.value ? 'solid' : 'ghost'"
+        :aria-pressed="type === option.value"
+        @click="setType(option.value)"
+      >
+        {{ option.label }}
+      </UButton>
     </div>
 
     <div class="mt-6">
@@ -40,8 +53,15 @@
         :description="errorMessage"
       />
 
-      <div v-else-if="pending" class="grid gap-3">
-        <USkeleton v-for="i in 8" :key="i" class="h-20" />
+      <div
+        v-else-if="pending"
+        class="grid gap-3"
+      >
+        <USkeleton
+          v-for="i in 8"
+          :key="i"
+          class="h-20"
+        />
       </div>
 
       <UAlert
@@ -51,7 +71,10 @@
         title="表示できる記事がありません"
       />
 
-      <div v-else class="grid gap-3">
+      <div
+        v-else
+        class="grid gap-3"
+      >
         <UCard
           v-for="item in data.items"
           :key="item.id"
@@ -92,12 +115,68 @@
 </template>
 
 <script setup lang="ts">
+import type { StoriesType } from '~/types/api'
 import { formatRelativeTimeFromUnixSeconds } from '~/utils/format'
 
-const page = ref(1)
 const pageSize = 30
 
-const { data, pending, error } = useStories({ type: 'top', page, pageSize })
+function firstQueryValue(value: unknown): string | undefined {
+  if (Array.isArray(value)) return typeof value[0] === 'string' ? value[0] : undefined
+  return typeof value === 'string' ? value : undefined
+}
+
+function normalizeStoriesType(value: unknown): StoriesType {
+  const v = firstQueryValue(value)
+  if (v === 'top' || v === 'new' || v === 'best') return v
+  return 'top'
+}
+
+function normalizePage(value: unknown): number {
+  const v = firstQueryValue(value)
+  const parsed = v ? Number.parseInt(v, 10) : Number.NaN
+  if (!Number.isFinite(parsed) || parsed < 1) return 1
+  return parsed
+}
+
+const route = useRoute()
+const router = useRouter()
+
+const type = computed<StoriesType>(() => normalizeStoriesType(route.query.type))
+const page = computed<number>(() => normalizePage(route.query.page))
+
+function setType(next: StoriesType) {
+  void router.push({
+    query: {
+      ...route.query,
+      type: next,
+      page: '1'
+    }
+  })
+}
+
+function setPage(next: number) {
+  const n = Math.max(1, Math.floor(next))
+  void router.push({
+    query: {
+      ...route.query,
+      page: String(n)
+    }
+  })
+}
+
+const typeOptions: Array<{ label: string, value: StoriesType }> = [
+  { label: 'Top', value: 'top' },
+  { label: 'New', value: 'new' },
+  { label: 'Best', value: 'best' }
+]
+
+const typeLabel = computed(() => {
+  if (type.value === 'new') return 'New'
+  if (type.value === 'best') return 'Best'
+  return 'Top'
+})
+
+const { data, pending, error } = useStories({ type, page, pageSize })
 
 const canGoNext = computed(() => {
   const total = data.value?.total ?? 0
