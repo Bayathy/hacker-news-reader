@@ -1,8 +1,4 @@
 // @ts-check
-import withNuxt from "./.nuxt/eslint.config.mjs";
+import withNuxt from './.nuxt/eslint.config.mjs'
 
-export default withNuxt({
-  features: {
-    stylistic: false,
-  },
-});
+export default withNuxt()
