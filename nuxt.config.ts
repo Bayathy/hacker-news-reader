@@ -9,7 +9,8 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   routeRules: {
-    '/': { prerender: true }
+    // HNは更新頻度が高いので、MVPではSSR + /api の短期キャッシュで運用する
+    '/': { prerender: false }
   },
 
   compatibilityDate: '2025-01-15',
