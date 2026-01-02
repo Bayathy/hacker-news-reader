@@ -5,7 +5,7 @@ import { extractDomain } from '../utils/url'
 function parseIntParam(
   value: unknown,
   fallback: number,
-  opts?: { min?: number; max?: number }
+  opts?: { min?: number, max?: number }
 ): number {
   const n = typeof value === 'string' ? Number.parseInt(value, 10) : Number(value)
   const num = Number.isFinite(n) ? n : fallback
@@ -25,7 +25,7 @@ function toListType(title: string, hnType?: string): StoryListItem['type'] {
   return 'story'
 }
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const query = getQuery(event)
 
   const type: StoriesType = isStoriesType(query.type) ? query.type : 'top'
@@ -85,8 +85,7 @@ export default defineEventHandler(async (event) => {
 
     const body: StoriesResponse = { type, page, pageSize, total, items }
     return body
-  }
-  catch (e) {
+  } catch (e) {
     setResponseStatus(event, 502, 'Bad Gateway')
     const body: ApiError = {
       statusCode: 502,
@@ -95,5 +94,4 @@ export default defineEventHandler(async (event) => {
     }
     return body
   }
-})
-
+}, { maxAge: 120 })

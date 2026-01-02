@@ -3,9 +3,7 @@ export function extractDomain(rawUrl: string | null | undefined): string | null 
   try {
     const url = new URL(rawUrl)
     return url.hostname || null
-  }
-  catch {
+  } catch {
     return null
   }
 }
-

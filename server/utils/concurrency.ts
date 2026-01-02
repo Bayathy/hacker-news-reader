@@ -14,7 +14,7 @@ export async function mapWithConcurrency<T, R>(
     while (true) {
       const current = nextIndex++
       if (current >= items.length) return
-      results[current] = await mapper(items[current], current)
+      results[current] = await mapper(items[current]!, current)
     }
   }
 
@@ -22,4 +22,3 @@ export async function mapWithConcurrency<T, R>(
   await Promise.all(workers)
   return results
 }
-

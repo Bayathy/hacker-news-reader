@@ -46,10 +46,8 @@ export async function fetchItems(ids: readonly number[], concurrency = 10): Prom
   return await mapWithConcurrency(ids, concurrency, async (id) => {
     try {
       return await fetchItem(id)
-    }
-    catch {
+    } catch {
       return null
     }
   })
 }
-

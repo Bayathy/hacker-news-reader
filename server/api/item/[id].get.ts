@@ -4,7 +4,7 @@ import { fetchItem, fetchItems } from '../../utils/hn'
 function parseIntParam(
   value: unknown,
   fallback: number,
-  opts?: { min?: number; max?: number }
+  opts?: { min?: number, max?: number }
 ): number {
   const n = typeof value === 'string' ? Number.parseInt(value, 10) : Number(value)
   const num = Number.isFinite(n) ? n : fallback
@@ -13,7 +13,7 @@ function parseIntParam(
   return Math.min(max, Math.max(min, num))
 }
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const rawId = event.context.params?.id
   const id = typeof rawId === 'string' ? Number.parseInt(rawId, 10) : Number(rawId)
 
@@ -30,8 +30,7 @@ export default defineEventHandler(async (event) => {
   let item: Awaited<ReturnType<typeof fetchItem>>
   try {
     item = await fetchItem(id)
-  }
-  catch (e) {
+  } catch (e) {
     setResponseStatus(event, 502, 'Bad Gateway')
     const body: ApiError = {
       statusCode: 502,
@@ -111,5 +110,4 @@ export default defineEventHandler(async (event) => {
   }
 
   return response
-})
-
+}, { maxAge: 120 })
