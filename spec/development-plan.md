@@ -49,14 +49,14 @@
 
 ### ルートルール / 生成（`routeRules`）の扱い（重要）
 
-このリポジトリは `nuxt.config.ts` に `routeRules` があり、`/` が `prerender: true` になっている。
+このリポジトリは `nuxt.config.ts` に `routeRules` があり、**MVPでは `/` を `prerender: false`（SSR）**としている。
 
 - HN は更新頻度が高いため、**一覧ページの完全プリレンダーは内容が古くなりやすい**。
 - 方針候補:
   - **SSR + サーバ側キャッシュ**（推奨）
   - もしくは `routeRules` を `swr` / `isr` 相当の戦略に寄せる（デプロイ環境に依存）
 
-※ MVP 段階では「SSR + `/api/*` の短期キャッシュ」を前提に設計する。
+※ MVP 段階では「SSR + `/api/*` の短期キャッシュ」を前提に設計する（更新目安: 1〜5分）。
 
 ### Composables（取得の統一）
 

@@ -110,4 +110,18 @@ export default defineCachedEventHandler(async (event) => {
   }
 
   return response
-}, { maxAge: 120 })
+}, {
+  maxAge: 120,
+  getKey: (event) => {
+    const rawId = event.context.params?.id
+    const id = typeof rawId === 'string' ? rawId : String(rawId ?? '')
+
+    const query = getQuery(event)
+    const includeComments = query.includeComments === '1'
+    if (!includeComments) return `item:${id}`
+
+    const maxComments = parseIntParam(query.maxComments, 50, { min: 0, max: 200 })
+    const maxDepth = parseIntParam(query.maxDepth, 4, { min: 1, max: 10 })
+    return `item:${id}:comments:${maxComments}:${maxDepth}`
+  }
+})
